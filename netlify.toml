@@ -1,29 +1,11 @@
-[[redirects]]
-  from = "/contact"
-  to = "/contact.html"
-  status = 200
-  force = true
+[build]
+  publish = "dist"
+  command = "npm run build"
 
 [[redirects]]
-  from = "/about"
-  to = "/about.html"
+  from = "/*"
+  to = "/index.html"
   status = 200
-  force = true
 
-[[redirects]]
-  from = "/systems"
-  to = "/systems.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/manufacturing"
-  to = "/manufacturing.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/projects"
-  to = "/projects.html"
-  status = 200
-  force = true
+[build.environment]
+  NODE_VERSION = "18"

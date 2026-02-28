@@ -2,23 +2,28 @@
   from = "/contact"
   to = "/contact.html"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/about"
   to = "/about.html"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/systems"
   to = "/systems.html"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/manufacturing"
   to = "/manufacturing.html"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/projects"
   to = "/projects.html"
   status = 200
+  force = true

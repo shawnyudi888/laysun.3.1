@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin, Phone, Mail, Clock, MessageCircle, Check, Plane } from 'lucide-react';
+import { 
+  ArrowRight, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Clock, 
+  MessageCircle, 
+  Check, 
+  Plane,
+  Facebook,
+  Linkedin,
+  Instagram,
+  Youtube
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { HeroSection } from '@/components/HeroSection';
 import { SectionTitle } from '@/components/SectionTitle';
@@ -18,8 +31,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// 直接内联数据，避免导入问题
+// TikTok Icon Component (Lucide doesn't have TikTok)
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg 
+      viewBox="0 0 24 24" 
+      fill="currentColor" 
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+    </svg>
+  );
+}
+
+// 内联数据
 const CONTENT = {
+  companyName: 'Laysun Co-Creation (Guangzhou) Technology Co., Ltd.',
   projectTypes: [
     { value: 'hotel', label: 'Hotel Group' },
     { value: 'retail', label: 'Retail Chain' },
@@ -41,26 +69,35 @@ const CONTENT = {
   ],
   offices: {
     us: {
-      title: 'United States Office',
-      purpose: 'Sales & Project Management',
-      address: 'Los Angeles, CA, USA',
+      title: 'USA Office',
+      purpose: 'For North America Wholesale Inquiries',
+      address: '20 Transom Rd, Port Wentworth, Georgia, 31407, United States',
       phone: '+1 213-829-8485',
       email: 'info@laysun.co',
       whatsapp: '+1 213-829-8485',
-      hours: 'Mon-Fri 9:00-18:00',
-      timezone: 'PST',
+      hours: '9:00-18:00',
+      timezone: 'PST / UTC-8',
+      responseTime: '12 working hours',
     },
     cn: {
-      title: 'China Office',
-      purpose: 'Manufacturing & Engineering',
-      address: 'Shenzhen, Guangdong, China',
-      phone: '+86 755-1234-5678',
-      email: 'china@laysun.co',
-      whatsapp: '+86 138-0000-0000',
-      hours: 'Mon-Fri 9:00-18:00',
-      timezone: 'CST',
-      airportInfo: '30 min from Shenzhen Bao\'an International Airport',
+      title: 'China Factory',
+      purpose: 'For Custom Project & Factory Direct Communication',
+      address: 'No. 25 Qiaofeng Road, Qishi Town, Dongguan City, Guangdong Province, China',
+      phone: '+86 138-0250-5260',
+      email: 'sales@laysun.co',
+      whatsapp: '+86 138-0250-5260',
+      hours: '9:00-18:00',
+      timezone: 'CST / UTC+8',
+      responseTime: '12 working hours',
+      airportInfo: '1.5 hours drive from Shenzhen Bao\'an International Airport, 1.5 hours drive from Guangzhou Baiyun International Airport',
     },
+  },
+  socialMedia: {
+    facebook: 'https://facebook.com/laysun', // 请替换为实际链接
+    linkedin: 'https://linkedin.com/company/laysun', // 请替换为实际链接
+    tiktok: 'https://tiktok.com/@laysun', // 请替换为实际链接
+    instagram: 'https://instagram.com/laysun', // 请替换为实际链接
+    youtube: 'https://youtube.com/laysun', // 请替换为实际链接
   },
 };
 
@@ -77,7 +114,6 @@ export function Contact() {
     setSubmitted(true);
   };
 
-  // 动画配置 - 与简化版本完全一致
   const formAnimation = {
     initial: { opacity: 0, x: -30 },
     animate: isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 },
@@ -94,6 +130,11 @@ export function Contact() {
     initial: { opacity: 0, y: 30 },
     animate: isOfficeInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 },
     transition: { duration: 0.6 },
+  };
+
+  // Google Maps 链接生成
+  const getGoogleMapsUrl = (address: string) => {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
   };
 
   return (
@@ -113,7 +154,7 @@ export function Contact() {
           <div className="max-w-3xl mx-auto text-center">
             <SectionTitle
               title="Commercial & Procurement Inquiries"
-              subtitle="We specialize in large-scale commercial projects for hotel groups, retail chains, and commercial developers. Our engineering team is ready to discuss your multi-city rollout requirements."
+              subtitle={`${CONTENT.companyName} specializes in large-scale commercial projects for hotel groups, retail chains, and commercial developers. Our engineering team is ready to discuss your multi-city rollout requirements.`}
             />
           </div>
         </div>
@@ -302,36 +343,36 @@ export function Contact() {
                     <div>
                       <p className="text-sm text-laysun-gray">General Inquiries</p>
                       <a
-                        href="mailto:info@laysun.co"
+                        href={`mailto:${CONTENT.offices.us.email}`}
                         className="text-laysun-dark hover:text-laysun-green transition-colors"
                       >
-                        info@laysun.co
+                        {CONTENT.offices.us.email}
                       </a>
                     </div>
                   </div>
                   <div className="flex items-start">
                     <Mail className="w-5 h-5 text-laysun-gold mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-laysun-gray">Sales</p>
+                      <p className="text-sm text-laysun-gray">Sales / Factory Direct</p>
                       <a
-                        href="mailto:sales@laysun.co"
+                        href={`mailto:${CONTENT.offices.cn.email}`}
                         className="text-laysun-dark hover:text-laysun-green transition-colors"
                       >
-                        sales@laysun.co
+                        {CONTENT.offices.cn.email}
                       </a>
                     </div>
                   </div>
                   <div className="flex items-start">
                     <MessageCircle className="w-5 h-5 text-laysun-gold mt-0.5 mr-3" />
                     <div>
-                      <p className="text-sm text-laysun-gray">WhatsApp</p>
+                      <p className="text-sm text-laysun-gray">WhatsApp (24H Quick Response)</p>
                       <a
-                        href="https://wa.me/12138298485"
+                        href={`https://wa.me/${CONTENT.offices.us.whatsapp.replace(/\D/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-laysun-dark hover:text-laysun-green transition-colors"
                       >
-                        +1 213-829-8485
+                        {CONTENT.offices.us.whatsapp} (USA)
                       </a>
                     </div>
                   </div>
@@ -344,12 +385,65 @@ export function Contact() {
                   <h4 className="font-heading font-semibold">Response Time</h4>
                 </div>
                 <p className="text-white/80 text-sm mb-4">
-                  Our engineering team commits to responding within 12 hours for qualified
-                  commercial inquiries.
+                  Our engineering team commits to responding within 12 working hours for qualified commercial inquiries.
                 </p>
                 <div className="flex items-center text-laysun-gold text-sm">
                   <Check className="w-4 h-4 mr-2" />
                   <span>12-hour response guarantee</span>
+                </div>
+              </div>
+
+              {/* Social Media Links */}
+              <div className="bg-white rounded-2xl p-6 shadow-card">
+                <h4 className="font-heading font-semibold text-laysun-dark mb-4">
+                  Follow Us
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href={CONTENT.socialMedia.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-[#1877F2] text-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                    aria-label="Facebook"
+                  >
+                    <Facebook className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={CONTENT.socialMedia.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-[#0A66C2] text-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={CONTENT.socialMedia.tiktok}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                    aria-label="TikTok"
+                  >
+                    <TikTokIcon className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={CONTENT.socialMedia.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 text-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={CONTENT.socialMedia.youtube}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 bg-[#FF0000] text-white rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
+                    aria-label="YouTube"
+                  >
+                    <Youtube className="w-5 h-5" />
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -367,7 +461,7 @@ export function Contact() {
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* US Office */}
+            {/* USA Office */}
             <motion.div
               {...officeAnimation}
               className="bg-laysun-gray-light rounded-2xl p-8"
@@ -388,10 +482,11 @@ export function Contact() {
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-laysun-gold mt-0.5 mr-3 flex-shrink-0" />
                   <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(CONTENT.offices.us.address)}`}
+                    href={getGoogleMapsUrl(CONTENT.offices.us.address)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-laysun-dark hover:text-laysun-green transition-colors"
+                    className="text-laysun-dark hover:text-laysun-green transition-colors underline decoration-dotted"
+                    title="Click to view on Google Maps"
                   >
                     {CONTENT.offices.us.address}
                   </a>
@@ -422,7 +517,7 @@ export function Contact() {
                     rel="noopener noreferrer"
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {CONTENT.offices.us.whatsapp}
+                    {CONTENT.offices.us.whatsapp} (24H Quick Response)
                   </a>
                 </div>
                 <div className="flex items-center">
@@ -434,7 +529,7 @@ export function Contact() {
               </div>
             </motion.div>
 
-            {/* China Office */}
+            {/* China Factory */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isOfficeInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -457,10 +552,11 @@ export function Contact() {
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-laysun-gold mt-0.5 mr-3 flex-shrink-0" />
                   <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(CONTENT.offices.cn.address)}`}
+                    href={getGoogleMapsUrl(CONTENT.offices.cn.address)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-laysun-dark hover:text-laysun-green transition-colors"
+                    className="text-laysun-dark hover:text-laysun-green transition-colors underline decoration-dotted"
+                    title="Click to view on Google Maps"
                   >
                     {CONTENT.offices.cn.address}
                   </a>
@@ -491,7 +587,7 @@ export function Contact() {
                     rel="noopener noreferrer"
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {CONTENT.offices.cn.whatsapp}
+                    {CONTENT.offices.cn.whatsapp} (24H Quick Response)
                   </a>
                 </div>
                 <div className="flex items-center">
@@ -512,7 +608,7 @@ export function Contact() {
         </div>
       </section>
 
-      {/* Trust Reinforcement - 使用 whileInView 替代 animate */}
+      {/* Trust Reinforcement */}
       <section className="section-padding bg-laysun-gray-light">
         <div className="container-custom">
           <motion.div

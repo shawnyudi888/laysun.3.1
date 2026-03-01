@@ -30,6 +30,7 @@
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
     "tailwindcss-animate": "^1.0.7"
+    "class-variance-authority": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.5",

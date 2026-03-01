@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, ChevronDown } from 'lucide-react';
+import { Menu, ChevronDown, Home } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { navigation, megaMenu, companyInfo } from '@/data/content';
 
@@ -8,6 +8,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
+  const resourcesTimerRef = useRef<NodeJS.Timeout | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -21,6 +22,20 @@ export function Header() {
 
   const isActive = (href: string) => {
     return location.pathname === href;
+  };
+
+  // 处理 Resources 下拉菜单的显示/隐藏（带延迟）
+  const handleMouseEnter = () => {
+    if (resourcesTimerRef.current) {
+      clearTimeout(resourcesTimerRef.current);
+    }
+    setIsResourcesOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    resourcesTimerRef.current = setTimeout(() => {
+      setIsResourcesOpen(false);
+    }, 300); // 300ms 延迟，让用户有时间移到下拉框
   };
 
   return (
@@ -46,6 +61,28 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
+            {/* Home 按钮 */}
+            <Link
+              to="/"
+              className={`flex items-center space-x-1 text-sm font-medium transition-colors duration-300 relative group ${
+                isScrolled
+                  ? isActive('/')
+                    ? 'text-laysun-green'
+                    : 'text-laysun-dark hover:text-laysun-green'
+                  : isActive('/')
+                  ? 'text-white'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              <Home className="w-4 h-4" />
+              <span>Home</span>
+              <span
+                className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${
+                  isScrolled ? 'bg-laysun-green' : 'bg-white'
+                }`}
+              />
+            </Link>
+
             {navigation.map((item) => (
               <Link
                 key={item.href}
@@ -69,11 +106,11 @@ export function Header() {
               </Link>
             ))}
 
-            {/* Resources Mega Menu */}
+            {/* Resources Mega Menu - 修复下拉菜单消失问题 */}
             <div
               className="relative"
-              onMouseEnter={() => setIsResourcesOpen(true)}
-              onMouseLeave={() => setIsResourcesOpen(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <button
                 className={`flex items-center space-x-1 text-sm font-medium transition-colors duration-300 ${
@@ -91,7 +128,11 @@ export function Header() {
               </button>
 
               {isResourcesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-card py-2 animate-fade-in-up">
+                <div 
+                  className="absolute top-full left-0 w-48 bg-white rounded-lg shadow-card py-2 animate-fade-in-up"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
                   {megaMenu.map((item) => (
                     <Link
                       key={item.href}
@@ -139,7 +180,21 @@ export function Header() {
                   </span>
                 </div>
 
-                <nav className="flex flex-col space-y-4">
+                <nav className="flex-col space-y-4">
+                  {/* Mobile Home */}
+                  <Link
+                    to="/"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center space-x-2 text-lg font-medium py-2 border-b border-gray-100 ${
+                      isActive('/')
+                        ? 'text-laysun-green'
+                        : 'text-laysun-dark hover:text-laysun-green'
+                    }`}
+                  >
+                    <Home className="w-5 h-5" />
+                    <span>Home</span>
+                  </Link>
+                  
                   {navigation.map((item) => (
                     <Link
                       key={item.href}

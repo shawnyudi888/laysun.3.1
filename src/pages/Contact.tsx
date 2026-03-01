@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { HeroSection } from '@/components/HeroSection';
 import { SectionTitle } from '@/components/SectionTitle';
 import { useInView } from '@/hooks/useInView';
-import { offices, projectTypes, budgetRanges, timelines } from '@/data/content';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,6 +18,52 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+// 直接内联数据，避免导入问题
+const CONTENT = {
+  projectTypes: [
+    { value: 'hotel', label: 'Hotel Group' },
+    { value: 'retail', label: 'Retail Chain' },
+    { value: 'commercial', label: 'Commercial Development' },
+    { value: 'industrial', label: 'Industrial Facility' },
+    { value: 'other', label: 'Other' },
+  ],
+  budgetRanges: [
+    { value: '50k-100k', label: '$50,000 - $100,000' },
+    { value: '100k-500k', label: '$100,000 - $500,000' },
+    { value: '500k-1m', label: '$500,000 - $1,000,000' },
+    { value: '1m+', label: '$1,000,000+' },
+  ],
+  timelines: [
+    { value: 'immediate', label: 'Immediate (0-3 months)' },
+    { value: 'short', label: 'Short-term (3-6 months)' },
+    { value: 'medium', label: 'Medium-term (6-12 months)' },
+    { value: 'long', label: 'Long-term (12+ months)' },
+  ],
+  offices: {
+    us: {
+      title: 'United States Office',
+      purpose: 'Sales & Project Management',
+      address: 'Los Angeles, CA, USA',
+      phone: '+1 213-829-8485',
+      email: 'info@laysun.co',
+      whatsapp: '+1 213-829-8485',
+      hours: 'Mon-Fri 9:00-18:00',
+      timezone: 'PST',
+    },
+    cn: {
+      title: 'China Office',
+      purpose: 'Manufacturing & Engineering',
+      address: 'Shenzhen, Guangdong, China',
+      phone: '+86 755-1234-5678',
+      email: 'china@laysun.co',
+      whatsapp: '+86 138-0000-0000',
+      hours: 'Mon-Fri 9:00-18:00',
+      timezone: 'CST',
+      airportInfo: '30 min from Shenzhen Bao\'an International Airport',
+    },
+  },
+};
+
 export function Contact() {
   const [formRef, isFormInView] = useInView<HTMLDivElement>({ threshold: 0.1 });
   const [officeRef, isOfficeInView] = useInView<HTMLDivElement>({ threshold: 0.2 });
@@ -30,6 +75,25 @@ export function Contact() {
     const id = `RFQ${new Date().getFullYear()}${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
     setRfqId(id);
     setSubmitted(true);
+  };
+
+  // 动画配置 - 与简化版本完全一致
+  const formAnimation = {
+    initial: { opacity: 0, x: -30 },
+    animate: isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 },
+    transition: { duration: 0.6 },
+  };
+
+  const sidebarAnimation = {
+    initial: { opacity: 0, x: 30 },
+    animate: isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 },
+    transition: { duration: 0.6, delay: 0.2 },
+  };
+
+  const officeAnimation = {
+    initial: { opacity: 0, y: 30 },
+    animate: isOfficeInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 },
+    transition: { duration: 0.6 },
   };
 
   return (
@@ -61,9 +125,7 @@ export function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Form */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-              transition={{ duration: 0.6 }}
+              {...formAnimation}
               className="lg:col-span-2"
             >
               <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-card">
@@ -145,7 +207,7 @@ export function Contact() {
                               <SelectValue placeholder="Select project type" />
                             </SelectTrigger>
                             <SelectContent>
-                              {projectTypes.map((type) => (
+                              {CONTENT.projectTypes.map((type) => (
                                 <SelectItem key={type.value} value={type.value}>
                                   {type.label}
                                 </SelectItem>
@@ -163,7 +225,7 @@ export function Contact() {
                               <SelectValue placeholder="Select budget range" />
                             </SelectTrigger>
                             <SelectContent>
-                              {budgetRanges.map((range) => (
+                              {CONTENT.budgetRanges.map((range) => (
                                 <SelectItem key={range.value} value={range.value}>
                                   {range.label}
                                 </SelectItem>
@@ -178,7 +240,7 @@ export function Contact() {
                               <SelectValue placeholder="Select timeline" />
                             </SelectTrigger>
                             <SelectContent>
-                              {timelines.map((timeline) => (
+                              {CONTENT.timelines.map((timeline) => (
                                 <SelectItem key={timeline.value} value={timeline.value}>
                                   {timeline.label}
                                 </SelectItem>
@@ -227,9 +289,7 @@ export function Contact() {
 
             {/* Contact Info Sidebar */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              {...sidebarAnimation}
               className="space-y-6"
             >
               <div className="bg-white rounded-2xl p-6 shadow-card">
@@ -309,9 +369,7 @@ export function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* US Office */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isOfficeInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.6 }}
+              {...officeAnimation}
               className="bg-laysun-gray-light rounded-2xl p-8"
             >
               <div className="flex items-center mb-6">
@@ -320,9 +378,9 @@ export function Contact() {
                 </div>
                 <div>
                   <h3 className="text-xl font-heading font-semibold text-laysun-dark">
-                    {offices.us.title}
+                    {CONTENT.offices.us.title}
                   </h3>
-                  <p className="text-sm text-laysun-gray">{offices.us.purpose}</p>
+                  <p className="text-sm text-laysun-gray">{CONTENT.offices.us.purpose}</p>
                 </div>
               </div>
 
@@ -330,47 +388,47 @@ export function Contact() {
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-laysun-gold mt-0.5 mr-3 flex-shrink-0" />
                   <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(offices.us.address)}`}
+                    href={`https://maps.google.com/?q=${encodeURIComponent(CONTENT.offices.us.address)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.us.address}
+                    {CONTENT.offices.us.address}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <a
-                    href={`tel:${offices.us.phone.replace(/\s/g, '')}`}
+                    href={`tel:${CONTENT.offices.us.phone.replace(/\s/g, '')}`}
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.us.phone}
+                    {CONTENT.offices.us.phone}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <a
-                    href={`mailto:${offices.us.email}`}
+                    href={`mailto:${CONTENT.offices.us.email}`}
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.us.email}
+                    {CONTENT.offices.us.email}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <MessageCircle className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <a
-                    href={`https://wa.me/${offices.us.whatsapp.replace(/\D/g, '')}`}
+                    href={`https://wa.me/${CONTENT.offices.us.whatsapp.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.us.whatsapp}
+                    {CONTENT.offices.us.whatsapp}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <span className="text-laysun-dark">
-                    {offices.us.hours} ({offices.us.timezone})
+                    {CONTENT.offices.us.hours} ({CONTENT.offices.us.timezone})
                   </span>
                 </div>
               </div>
@@ -389,9 +447,9 @@ export function Contact() {
                 </div>
                 <div>
                   <h3 className="text-xl font-heading font-semibold text-laysun-dark">
-                    {offices.cn.title}
+                    {CONTENT.offices.cn.title}
                   </h3>
-                  <p className="text-sm text-laysun-gray">{offices.cn.purpose}</p>
+                  <p className="text-sm text-laysun-gray">{CONTENT.offices.cn.purpose}</p>
                 </div>
               </div>
 
@@ -399,53 +457,53 @@ export function Contact() {
                 <div className="flex items-start">
                   <MapPin className="w-5 h-5 text-laysun-gold mt-0.5 mr-3 flex-shrink-0" />
                   <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(offices.cn.address)}`}
+                    href={`https://maps.google.com/?q=${encodeURIComponent(CONTENT.offices.cn.address)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.cn.address}
+                    {CONTENT.offices.cn.address}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <a
-                    href={`tel:${offices.cn.phone.replace(/\s/g, '')}`}
+                    href={`tel:${CONTENT.offices.cn.phone.replace(/\s/g, '')}`}
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.cn.phone}
+                    {CONTENT.offices.cn.phone}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <a
-                    href={`mailto:${offices.cn.email}`}
+                    href={`mailto:${CONTENT.offices.cn.email}`}
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.cn.email}
+                    {CONTENT.offices.cn.email}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <MessageCircle className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <a
-                    href={`https://wa.me/${offices.cn.whatsapp.replace(/\D/g, '')}`}
+                    href={`https://wa.me/${CONTENT.offices.cn.whatsapp.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-laysun-dark hover:text-laysun-green transition-colors"
                   >
-                    {offices.cn.whatsapp}
+                    {CONTENT.offices.cn.whatsapp}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 text-laysun-gold mr-3 flex-shrink-0" />
                   <span className="text-laysun-dark">
-                    {offices.cn.hours} ({offices.cn.timezone})
+                    {CONTENT.offices.cn.hours} ({CONTENT.offices.cn.timezone})
                   </span>
                 </div>
-                {offices.cn.airportInfo && (
+                {CONTENT.offices.cn.airportInfo && (
                   <div className="flex items-start">
                     <Plane className="w-5 h-5 text-laysun-gold mt-0.5 mr-3 flex-shrink-0" />
-                    <span className="text-laysun-gray text-sm">{offices.cn.airportInfo}</span>
+                    <span className="text-laysun-gray text-sm">{CONTENT.offices.cn.airportInfo}</span>
                   </div>
                 )}
               </div>
@@ -454,13 +512,13 @@ export function Contact() {
         </div>
       </section>
 
-      {/* Trust Reinforcement */}
+      {/* Trust Reinforcement - 使用 whileInView 替代 animate */}
       <section className="section-padding bg-laysun-gray-light">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto text-center"
           >

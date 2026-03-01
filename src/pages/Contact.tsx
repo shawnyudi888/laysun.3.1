@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MapPin, Phone, Mail, Clock, MessageCircle, Check, Plane } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -24,17 +24,44 @@ export function Contact() {
   const [officeRef, isOfficeInView] = useInView<HTMLDivElement>({ threshold: 0.2 });
   const [submitted, setSubmitted] = useState(false);
   const [rfqId, setRfqId] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // 确保组件挂载后显示内容，防止动画导致空白
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Generate RFQ ID
     const id = `RFQ${new Date().getFullYear()}${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`;
     setRfqId(id);
     setSubmitted(true);
   };
 
+  // 动画配置 - 使用 whileInView 替代 animate，更可靠
+  const fadeInLeft = {
+    initial: { opacity: 0, x: -30 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true, amount: 0.1 },
+    transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
+  };
+
+  const fadeInRight = {
+    initial: { opacity: 0, x: 30 },
+    whileInView: { opacity: 1, x: 0 },
+    viewport: { once: true, amount: 0.1 },
+    transition: { duration: 0.6, delay: 0.2, ease: [0.4, 0, 0.2, 1] }
+  };
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, amount: 0.2 },
+    transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] }
+  };
+
   return (
-    <main>
+    <main className={isLoaded ? 'opacity-100' : 'opacity-0'}>
       {/* Hero Section */}
       <HeroSection
         title="Start Your Multi-City Green System Project"
@@ -62,9 +89,7 @@ export function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Form */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+              {...fadeInLeft}
               className="lg:col-span-2"
             >
               <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-card">
@@ -228,9 +253,7 @@ export function Contact() {
 
             {/* Contact Info Sidebar */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={isFormInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-              transition={{ duration: 0.6, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              {...fadeInRight}
               className="space-y-6"
             >
               <div className="bg-white rounded-2xl p-6 shadow-card">
@@ -310,9 +333,7 @@ export function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* US Office */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isOfficeInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+              {...fadeInUp}
               className="bg-laysun-gray-light rounded-2xl p-8"
             >
               <div className="flex items-center mb-6">
@@ -380,7 +401,8 @@ export function Contact() {
             {/* China Office */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={isOfficeInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
               className="bg-laysun-gray-light rounded-2xl p-8"
             >

@@ -2,15 +2,19 @@ backend:
   name: github
   repo: shawnyudi888/laysun.3.1
   branch: main
-  
-  # 使用 GitHub 个人访问令牌（PAT）方式
-  # 不需要 Netlify，直接对接 GitHub API
   base_url: https://www.laysun.co
   auth_endpoint: /api/auth
-
-# 开发阶段：使用测试模式
-local_backend: true
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
 site_url: https://www.laysun.co
+
+collections:
+  - name: "projects"
+    label: "Projects"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }

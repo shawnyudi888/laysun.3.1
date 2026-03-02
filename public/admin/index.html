@@ -3,13 +3,79 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Content Manager</title>
-  <link rel="stylesheet" href="https://unpkg.com/decap-cms@^3.1.0/dist/decap-cms.css" />
+  <meta name="robots" content="noindex" />
+  <title>Content Manager | LAYSUN</title>
+  
+  <!-- Decap CMS 样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.css" />
+  
+  <!-- 自定义样式 -->
+  <style>
+    /* 自定义 CMS 界面样式 */
+    :root {
+      --primary-color: #10B981;
+      --primary-light: #D1FAE5;
+    }
+    
+    /* 侧边栏 Logo 区域 */
+    [class*="SidebarContainer"] {
+      background: linear-gradient(180deg, #065F46 0%, #10B981 100%) !important;
+    }
+    
+    /* 主按钮 */
+    [class*="StyledButton"] {
+      background-color: var(--primary-color) !important;
+    }
+    
+    /* 选中状态 */
+    [class*="ListItem"][class*="selected"] {
+      border-left-color: var(--primary-color) !important;
+      background-color: var(--primary-light) !important;
+    }
+    
+    /* 预览区域 */
+    [class*="PreviewPane"] {
+      background: #f9fafb;
+    }
+  </style>
+  
+  <!-- Netlify Identity -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script src="https://unpkg.com/decap-cms@^3.1.0/dist/decap-cms.js"></script>
+  <!-- 登录状态检查 -->
   <script>
-    CMS.init();
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+  </script>
+  
+  <!-- 加载 Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  
+  <!-- 自定义预览组件 -->
+  <script>
+    // 注册项目卡片预览
+    CMS.registerPreviewTemplate("projects", createClass({
+      render: function() {
+        var entry = this.props.entry;
+        var title = entry.getIn(['data', 'title']);
+        var coverImage = entry.getIn(['data', 'media', 'coverImage']);
+        var summary = entry.getIn(['data', 'content', 'summary']);
+        
+        return h('div', {style: {padding: '20px', fontFamily: 'system-ui'}},
+          h('h1', {}, title),
+          coverImage && h('img', {src: coverImage, style: {maxWidth: '100%', borderRadius: '8px', marginBottom: '16px'}}),
+          h('p', {style: {color: '#666', lineHeight: '1.6'}}, summary)
+        );
+      }
+    }));
   </script>
 </body>
 </html>

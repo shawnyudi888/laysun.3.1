@@ -1,5 +1,13 @@
 export async function onRequest(context) {
-  const { env } = context;
+  const { request, env } = context;
+  const url = new URL(request.url);
+  
+  // 只处理 /api/auth 路径
+  if (url.pathname !== '/api/auth') {
+    // 如果不是 /api/auth，返回 404 让静态文件服务处理
+    return new Response('Not Found', { status: 404 });
+  }
+  
   const token = env.GITHUB_TOKEN;
   
   if (!token) {
@@ -9,10 +17,10 @@ export async function onRequest(context) {
     });
   }
   
-  // 验证 token 有效性 - 使用 Bearer 格式（新方式）
+  // 验证 token 有效性
   const userRes = await fetch('https://api.github.com/user', {
     headers: {
-      'Authorization': `Bearer ${token}`,  // ← 改成 Bearer
+      'Authorization': `Bearer ${token}`,
       'User-Agent': 'LAYSUN-CMS',
       'Accept': 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
@@ -43,7 +51,15 @@ export async function onRequest(context) {
   });
 }
 
-export async function onRequestOptions() {
+export async function onRequestOptions(context) {
+  const { request } = context;
+  const url = new URL(request.url);
+  
+  // 只处理 /api/auth 路径的预检请求
+  if (url.pathname !== '/api/auth') {
+    return new Response(null, { status: 404 });
+  }
+  
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',

@@ -3,27 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Content Manager</title>
-  <!-- 重点：引入 Decap CMS 的脚本 -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <title>Content Manager | LAYSUN</title>
+  <style>
+    /* 给个背景色，避免加载瞬间白屏 */
+    body { background-color: #f5f5f5; margin: 0; }
+  </style>
 </head>
 <body>
+  <!-- 定义 CMS 挂载的根节点 -->
+  <div id="root"></div>
+
   <!-- 这个脚本是为了让 CMS 能够正确识别你的身份验证端点 -->
   <script>
-    // 确保 CMS 知道我们的认证端点不是默认的 OAuth，而是我们自己的 /api/auth
     window.CMS = window.CMS || {};
     window.CMS.init = {
-      load_config_file: false, // 告诉 CMS 从全局变量获取配置，而不是加载 config.yml（因为我们已经在页面中配置了）
       backend: {
         name: 'github',
-        repo: '你的GitHub用户名/laysun-website', // 再次确认这里的仓库名是否正确
+        repo: 'shawnyudi888/laysun.3.1',
         branch: 'main',
         base_url: 'https://www.laysun.co',
-        auth_endpoint: 'api/auth' // 明确指定认证端点
+        auth_endpoint: 'api/auth'
+      },
+      // 添加本地后端配置，避免不必要的请求
+      local_backend: false,
+      // 加载配置文件的路径
+      config: {
+        load_config_file: true,
+        config_file: '/admin/config.yml'
       }
     };
   </script>
-  <!-- 这个 div 是 CMS 挂载的根节点 -->
-  <div id="root"></div>
+
+  <!-- 将脚本放在 body 底部，并添加 defer 确保在 DOM 加载后执行 -->
+  <script src="https://cdn.jsdelivr.net/npm/decap-cms@3.0.0/dist/decap-cms.js" defer></script>
+
+  <!-- 可选：加载失败时的备用方案 -->
+  <script>
+    // 检查 CMS 是否成功加载
+    setTimeout(function() {
+      if (!document.getElementById('root')?.children?.length) {
+        console.log('CMS 加载较慢，请稍候...');
+        // 可以在这里显示一个加载提示
+      }
+    }, 3000);
+  </script>
 </body>
 </html>

@@ -3,50 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Content Manager | LAYSUN</title>
+  <title>Content Manager</title>
 </head>
 <body>
-  <!-- 加载CMS脚本 -->
+  <!-- 直接引入 CMS，不加任何配置 -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  
-  <script>
-    // 等CMS加载完成
-    setTimeout(function() {
-      if (window.CMS) {
-        // 直接硬编码配置，不依赖任何外部变量
-        window.CMS.init({
-          config: {
-            backend: {
-              name: 'github',
-              repo: 'shawnyudi888/laysun.3.1',
-              branch: 'main',
-              base_url: 'https://www.laysun.co',
-              auth_endpoint: 'api/auth',
-              auth_type: 'implicit'
-            },
-            media_folder: 'public/uploads',
-            public_folder: '/uploads',
-            collections: [
-              {
-                name: 'projects',
-                label: 'Projects / 项目',
-                folder: 'content/projects',
-                create: true,
-                slug: '{{slug}}',
-                fields: [
-                  { label: '标题', name: 'title', widget: 'string' },
-                  { label: '发布日期', name: 'date', widget: 'datetime' },
-                  { label: '封面图片', name: 'image', widget: 'image' },
-                  { label: '简介', name: 'description', widget: 'text' },
-                  { label: '详细内容', name: 'body', widget: 'markdown' }
-                ]
-              }
-            ]
-          }
-        });
-        console.log('CMS initialized with hardcoded config');
-      }
-    }, 500);
-  </script>
 </body>
 </html>

@@ -1,10 +1,11 @@
 backend:
-  name: git-gateway
+  name: github
   repo: shawnyudi888/laysun.3.1
   branch: main
-
-# 或者使用测试模式
-local_backend: true
+  
+  # 使用我们的 Cloudflare Function 进行认证
+  base_url: https://www.laysun.co
+  auth_endpoint: /api/auth
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
@@ -12,7 +13,7 @@ site_url: https://www.laysun.co
 
 collections:
   - name: "projects"
-    label: "Projects"
+    label: "🏗️ Projects / 项目"
     folder: "src/content/projects"
     create: true
     slug: "{{slug}}"

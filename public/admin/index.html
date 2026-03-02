@@ -1,81 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex" />
-  <title>Content Manager | LAYSUN</title>
-  
-  <!-- Decap CMS 样式 --> 
-  <link rel="stylesheet" href="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.css" />
-  
-  <!-- 自定义样式 -->
-  <style>
-    /* 自定义 CMS 界面样式 */
-    :root {
-      --primary-color: #10B981;
-      --primary-light: #D1FAE5;
-    }
-    
-    /* 侧边栏 Logo 区域 */
-    [class*="SidebarContainer"] {
-      background: linear-gradient(180deg, #065F46 0%, #10B981 100%) !important;
-    }
-    
-    /* 主按钮 */
-    [class*="StyledButton"] {
-      background-color: var(--primary-color) !important;
-    }
-    
-    /* 选中状态 */
-    [class*="ListItem"][class*="selected"] {
-      border-left-color: var(--primary-color) !important;
-      background-color: var(--primary-light) !important;
-    }
-    
-    /* 预览区域 */
-    [class*="PreviewPane"] {
-      background: #f9fafb;
-    }
-  </style>
-  
-  <!-- Netlify Identity -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <title>Content Manager</title>
+  <!-- 重点：引入 Decap CMS 的脚本 -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </head>
 <body>
-  <!-- 登录状态检查 -->
+  <!-- 这个脚本是为了让 CMS 能够正确识别你的身份验证端点 -->
   <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on("init", user => {
-        if (!user) {
-          window.netlifyIdentity.on("login", () => {
-            document.location.href = "/admin/";
-          });
-        }
-      });
-    }
-  </script>
-  
-  <!-- 加载 Decap CMS -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  
-  <!-- 自定义预览组件 -->
-  <script>
-    // 注册项目卡片预览
-    CMS.registerPreviewTemplate("projects", createClass({
-      render: function() {
-        var entry = this.props.entry;
-        var title = entry.getIn(['data', 'title']);
-        var coverImage = entry.getIn(['data', 'media', 'coverImage']);
-        var summary = entry.getIn(['data', 'content', 'summary']);
-        
-        return h('div', {style: {padding: '20px', fontFamily: 'system-ui'}},
-          h('h1', {}, title),
-          coverImage && h('img', {src: coverImage, style: {maxWidth: '100%', borderRadius: '8px', marginBottom: '16px'}}),
-          h('p', {style: {color: '#666', lineHeight: '1.6'}}, summary)
-        );
+    // 确保 CMS 知道我们的认证端点不是默认的 OAuth，而是我们自己的 /api/auth
+    window.CMS = window.CMS || {};
+    window.CMS.init = {
+      load_config_file: false, // 告诉 CMS 从全局变量获取配置，而不是加载 config.yml（因为我们已经在页面中配置了）
+      backend: {
+        name: 'github',
+        repo: '你的GitHub用户名/laysun-website', // 再次确认这里的仓库名是否正确
+        branch: 'main',
+        base_url: 'https://www.laysun.co',
+        auth_endpoint: 'api/auth' // 明确指定认证端点
       }
-    }));
+    };
   </script>
+  <!-- 这个 div 是 CMS 挂载的根节点 -->
+  <div id="root"></div>
 </body>
 </html>

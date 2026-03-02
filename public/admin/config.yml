@@ -1,17 +1,21 @@
 backend:
-  name: github
+  name: git-gateway
   repo: shawnyudi888/laysun.3.1
   branch: main
-  base_url: https://www.laysun.co
-  auth_endpoint: /api/auth
+
+# 或者使用测试模式
+local_backend: true
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
+site_url: https://www.laysun.co
+
 collections:
-  - name: projects
-    label: Projects
-    folder: src/content/projects
+  - name: "projects"
+    label: "Projects"
+    folder: "src/content/projects"
     create: true
+    slug: "{{slug}}"
     fields:
-      - { name: title, label: Title, widget: string }
-      - { name: body, label: Body, widget: markdown }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }

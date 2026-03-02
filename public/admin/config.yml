@@ -7,14 +7,11 @@ backend:
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
-site_url: https://www.laysun.co
-
 collections:
-  - name: "projects"
-    label: "Projects"
-    folder: "src/content/projects"
+  - name: projects
+    label: Projects
+    folder: src/content/projects
     create: true
-    slug: "{{slug}}"
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { name: title, label: Title, widget: string }
+      - { name: body, label: Body, widget: markdown }

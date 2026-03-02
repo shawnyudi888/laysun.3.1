@@ -1,61 +1,46 @@
 import { Link } from 'react-router-dom';
-import { MapPin, BadgeCheck } from 'lucide-react';
-import type { Project } from '@/types';
+import type { Project } from '@/types/content';
 
-interface ProjectCardProps {
+interface Props {
   project: Project;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project }: Props) {
   return (
-    <Link to={`/projects/${project.slug}`} className="card group block">
-      <div className="relative aspect-video overflow-hidden">
-        <img
-          src={project.image}
-          alt={project.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <article className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
+      <Link to={`/projects/${project.slug}`} className="block">
+        {/* 封面图 */}
+        <div className="aspect-[4/3] overflow-hidden">
+          <img 
+            src={project.coverImage} 
+            alt={project.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        </div>
         
-        {/* Scalable Badge */}
-        {project.scalable && (
-          <div className="absolute top-3 right-3 bg-laysun-gold text-white text-xs font-medium px-2 py-1 rounded flex items-center space-x-1">
-            <BadgeCheck className="w-3 h-3" />
-            <span>Scalable</span>
-          </div>
-        )}
-      </div>
-      
-      <div className="p-5">
-        {/* Industry Tag */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-laysun-gold uppercase tracking-wider">
-            {project.industry}
+        {/* 内容 */}
+        <div className="p-6">
+          <span className="inline-block px-3 py-1 text-xs font-medium text-emerald-700 bg-emerald-100 rounded-full mb-3">
+            {project.category}
           </span>
-          {project.clientType && (
-            <span className="text-xs text-laysun-gray bg-laysun-gray-light px-2 py-0.5 rounded">
-              {project.clientType}
-            </span>
-          )}
+          
+          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
+            {project.title}
+          </h3>
+          
+          <p className="text-gray-600 text-sm line-clamp-2">
+            {project.summary}
+          </p>
+          
+          <div className="mt-4 flex items-center text-emerald-600 font-medium text-sm">
+            Learn more
+            <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
-        
-        {/* Title */}
-        <h3 className="text-lg font-heading font-semibold text-laysun-dark mb-2 group-hover:text-laysun-green transition-colors line-clamp-2">
-          {project.title}
-        </h3>
-        
-        {/* Location */}
-        <div className="flex items-center text-sm text-laysun-gray">
-          <MapPin className="w-4 h-4 mr-1" />
-          <span>{project.location}, {project.country}</span>
-        </div>
-        
-        {/* Excerpt */}
-        <p className="text-sm text-laysun-gray mt-3 line-clamp-2">
-          {project.excerpt}
-        </p>
-      </div>
-    </Link>
+      </Link>
+    </article>
   );
 }

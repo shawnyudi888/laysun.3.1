@@ -1,0 +1,54 @@
+export async function onRequest(context) {
+  const { env } = context;
+  const token = env.GITHUB_TOKEN;
+  
+  if (!token) {
+    return new Response(JSON.stringify({ error: 'Token not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  
+  // 验证 token 有效性
+  const userRes = await fetch('https://api.github.com/user', {
+    headers: {
+      'Authorization': `token ${token}`,
+      'User-Agent': 'LAYSUN-CMS',
+    },
+  });
+  
+  if (!userRes.ok) {
+    return new Response(JSON.stringify({ error: 'Invalid token' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  
+  const user = await userRes.json();
+  
+  // 返回 token 给 CMS
+  return new Response(JSON.stringify({
+    token: token,
+    provider: 'github',
+    user: {
+      name: user.name || user.login,
+      email: user.email,
+    },
+  }), {
+    headers: { 
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
+}
+
+// 处理预检请求
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}

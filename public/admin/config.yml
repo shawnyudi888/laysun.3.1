@@ -2,21 +2,44 @@ backend:
   name: github
   repo: shawnyudi888/laysun.3.1
   branch: main
-  
   # 使用我们的 Cloudflare Function 进行认证
-  base_url: https://www.laysun.co
   auth_endpoint: /api/auth
+  base_url: https://www.laysun.co
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
-site_url: https://www.laysun.co
 
 collections:
   - name: "projects"
-    label: "🏗️ Projects / 项目"
-    folder: "src/content/projects"
+    label: "Projects / 项目"
+    folder: "content/projects"
     create: true
     slug: "{{slug}}"
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime" }
+      - { label: "封面图片", name: "image", widget: "image" }
+      - { label: "简介", name: "description", widget: "text" }
+      - { label: "详细内容", name: "body", widget: "markdown" }
+      - { label: "项目链接", name: "link", widget: "string", required: false }
+      - { label: "排序权重", name: "weight", widget: "number", valueType: "int", default: 0 }
+
+  - name: "categories"
+    label: "Categories / 分类"
+    folder: "content/categories"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "分类名称", name: "title", widget: "string" }
+      - { label: "描述", name: "description", widget: "text", required: false }
+
+  - name: "pages"
+    label: "Pages / 独立页面"
+    folder: "content/pages"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "页面标题", name: "title", widget: "string" }
+      - { label: "内容", name: "body", widget: "markdown" }
+      - { label: "显示在导航", name: "show_in_nav", widget: "boolean", default: true }
+      - { label: "导航排序", name: "nav_order", widget: "number", required: false }

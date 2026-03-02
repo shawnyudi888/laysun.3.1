@@ -1,12 +1,5 @@
 export async function onRequest(context) {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  
-  // 只处理 /api/auth 路径
-  if (url.pathname !== '/api/auth') {
-    return new Response('Not Found', { status: 404 });
-  }
-  
+  const { env } = context;
   const token = env.GITHUB_TOKEN;
   
   if (!token) {
@@ -49,14 +42,7 @@ export async function onRequest(context) {
   });
 }
 
-export async function onRequestOptions(context) {
-  const { request } = context;
-  const url = new URL(request.url);
-  
-  if (url.pathname !== '/api/auth') {
-    return new Response(null, { status: 404 });
-  }
-  
+export async function onRequestOptions() {
   return new Response(null, {
     headers: {
       'Access-Control-Allow-Origin': '*',

@@ -2,7 +2,7 @@ backend:
   name: github
   repo: shawnyudi888/laysun.3.1
   branch: main
-  # 使用我们的 Cloudflare Function 进行认证
+  # 使用 Cloudflare Function 进行认证
   auth_endpoint: /api/auth
   base_url: https://www.laysun.co
 
@@ -22,7 +22,7 @@ collections:
       - { label: "简介", name: "description", widget: "text" }
       - { label: "详细内容", name: "body", widget: "markdown" }
       - { label: "项目链接", name: "link", widget: "string", required: false }
-      - { label: "排序权重", name: "weight", widget: "number", valueType: "int", default: 0 }
+      - { label: "排序权重", name: "weight", widget: "number", value_type: "int", default: 0 }
 
   - name: "categories"
     label: "Categories / 分类"

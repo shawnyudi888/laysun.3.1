@@ -1,42 +1,53 @@
-// Cloudflare Pages Function - 处理 GitHub 认证
 export async function onRequest(context) {
-  const { request, env } = context;
+  const { env } = context;
   
-  const clientId = env.GITHUB_CLIENT_ID;
-  const clientSecret = env.GITHUB_CLIENT_SECRET;
+  const token = env.GITHUB_TOKEN;
   
-  // 处理 OAuth 回调
-  const url = new URL(request.url);
-  const code = url.searchParams.get('code');
-  
-  if (code) {
-    // 交换 code 获取 access_token
-    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        client_id: clientId,
-        client_secret: clientSecret,
-        code,
-      }),
-    });
-    
-    const tokenData = await tokenRes.json();
-    
-    // 设置 cookie 并重定向到 admin
-    return new Response(null, {
-      status: 302,
-      headers: {
-        'Location': '/admin/',
-        'Set-Cookie': `github_token=${tokenData.access_token}; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`,
-      },
+  if (!token) {
+    return new Response(JSON.stringify({ error: 'Token not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
     });
   }
   
-  // 未登录，重定向到 GitHub OAuth
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=repo`;
-  return Response.redirect(githubAuthUrl, 302);
+  // 验证 token 有效性
+  const userRes = await fetch('https://api.github.com/user', {
+    headers: {
+      'Authorization': `token ${token}`,
+      'User-Agent': 'LAYSUN-CMS',
+    },
+  });
+  
+  if (!userRes.ok) {
+    return new Response(JSON.stringify({ error: 'Invalid token' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  
+  const user = await userRes.json();
+  
+  return new Response(JSON.stringify({
+    token: token,
+    provider: 'github',
+    user: {
+      name: user.name || user.login,
+      email: user.email,
+    },
+  }), {
+    headers: { 
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
 }

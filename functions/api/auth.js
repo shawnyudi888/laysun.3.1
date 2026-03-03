@@ -2,10 +2,8 @@ export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   
-  // 获取 code（GitHub OAuth 回调会带 code 参数）
   const code = url.searchParams.get('code');
   
-  // 如果没有 code，重定向到 GitHub 授权页面
   if (!code) {
     const clientId = env.GITHUB_CLIENT_ID;
     const redirectUri = encodeURIComponent('https://www.laysun.co/api/auth');
@@ -49,7 +47,6 @@ export async function onRequest(context) {
 
   const user = await userRes.json();
 
-  // 构建 Decap CMS 期望的数据格式
   const authData = {
     token: accessToken,
     provider: 'github',
@@ -60,7 +57,7 @@ export async function onRequest(context) {
     },
   };
 
-  // 返回 HTML 页面，执行 postMessage 并关闭窗口
+  // 返回 HTML，添加调试和重试机制
   const html = `
 <!DOCTYPE html>
 <html>
@@ -70,14 +67,28 @@ export async function onRequest(context) {
 <body>
   <script>
     (function() {
-      window.opener.postMessage(
-        ${JSON.stringify(JSON.stringify(authData))},
-        '*'
-      );
-      window.close();
+      var authData = ${JSON.stringify(JSON.stringify(authData))};
+      
+      function sendMessage() {
+        if (window.opener) {
+          window.opener.postMessage(authData, '*');
+          console.log('Message sent to opener');
+          setTimeout(function() {
+            window.close();
+          }, 100);
+        } else {
+          console.error('No window.opener found');
+          // 尝试通过 localStorage 传递（备用方案）
+          localStorage.setItem('decap-cms-auth', authData);
+          document.body.innerHTML = '<p>Authentication successful. Please close this window and refresh the admin page.</p>';
+        }
+      }
+      
+      // 延迟执行，确保 opener 已准备好
+      setTimeout(sendMessage, 100);
     })();
   </script>
-  <p>Authentication successful. You can close this window.</p>
+  <p>Processing authentication...</p>
 </body>
 </html>
   `;
@@ -87,7 +98,6 @@ export async function onRequest(context) {
   });
 }
 
-// 处理 OPTIONS 请求（CORS 预检）
 export async function onRequestOptions() {
   return new Response(null, {
     headers: {

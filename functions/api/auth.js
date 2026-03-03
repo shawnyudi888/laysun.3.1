@@ -1,53 +1,90 @@
 export async function onRequest(context) {
-  const { env } = context;
-  const token = env.GITHUB_TOKEN;
+  const { request, env } = context;
+  const url = new URL(request.url);
   
-  if (!token) {
-    return new Response(JSON.stringify({ error: 'Token not configured' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  // 获取 code（GitHub OAuth 回调会带 code 参数）
+  const code = url.searchParams.get('code');
+  
+  // 如果没有 code，说明是 Decap CMS 初始请求，重定向到 GitHub OAuth
+  if (!code) {
+    const clientId = env.GITHUB_CLIENT_ID;
+    const redirectUri = encodeURIComponent('https://www.laysun.co/api/auth');
+    const scope = 'repo';
+    
+    return Response.redirect(
+      `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`,
+      302
+    );
   }
+
+  // 用 code 换取 access_token
+  const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      client_id: env.GITHUB_CLIENT_ID,
+      client_secret: env.GITHUB_CLIENT_SECRET,
+      code: code,
+    }),
+  });
+
+  const tokenData = await tokenRes.json();
   
+  if (tokenData.error) {
+    return new Response(JSON.stringify(tokenData), { status: 400 });
+  }
+
+  const accessToken = tokenData.access_token;
+
+  // 获取用户信息
   const userRes = await fetch('https://api.github.com/user', {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${accessToken}`,
       'User-Agent': 'LAYSUN-CMS',
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
     },
   });
-  
-  if (!userRes.ok) {
-    return new Response(JSON.stringify({ error: 'Invalid token' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-  
+
   const user = await userRes.json();
-  
-  return new Response(JSON.stringify({
-    token: token,
+
+  // 构建 Decap CMS 期望的数据格式
+  const authData = {
+    token: accessToken,
     provider: 'github',
     user: {
       name: user.name || user.login,
       email: user.email,
+      avatar_url: user.avatar_url,
     },
-  }), {
-    headers: { 
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  });
-}
+  };
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
+  // 返回 HTML 页面，执行 postMessage 并关闭窗口
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Auth Callback</title>
+</head>
+<body>
+  <script>
+    (function() {
+      // 发送认证数据给父窗口（Decap CMS）
+      window.opener.postMessage(
+        ${JSON.stringify(JSON.stringify(authData))},
+        '*'
+      );
+      // 关闭当前窗口
+      window.close();
+    })();
+  </script>
+  <p>Authentication successful. You can close this window.</p>
+</body>
+</html>
+  `;
+
+  return new Response(html, {
+    headers: { 'Content-Type': 'text/html' },
   });
 }

@@ -2,7 +2,7 @@ backend:
   name: github
   repo: shawnyudi888/laysun.3.1
   branch: main
-  base_url: https://www.laysun.co
+  base_url: https://laysun.co
   auth_endpoint: api/auth
 
 # 启用编辑工作流（可选，推荐用于团队协作）

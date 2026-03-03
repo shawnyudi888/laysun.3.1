@@ -1,6 +1,9 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: shawnyudi888/laysun.3.1
   branch: main
+  base_url: https://www.laysun.co
+  auth_endpoint: api/auth
 
 # 启用编辑工作流（可选，推荐用于团队协作）
 publish_mode: editorial_workflow
@@ -10,7 +13,7 @@ media_folder: "static/images/uploads"
 public_folder: "/images/uploads"
 
 # 网站信息（可选）
-site_url: https://splendid-paprenjak-0c2f14.netlify.app
+site_url: https://www.laysun.co  # 修改为你的域名
 
 # 内容集合配置 - 根据您的项目调整
 collections:

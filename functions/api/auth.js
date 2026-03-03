@@ -5,7 +5,7 @@ export async function onRequest(context) {
   // 获取 code（GitHub OAuth 回调会带 code 参数）
   const code = url.searchParams.get('code');
   
-  // 如果没有 code，说明是 Decap CMS 初始请求，重定向到 GitHub OAuth
+  // 如果没有 code，重定向到 GitHub 授权页面
   if (!code) {
     const clientId = env.GITHUB_CLIENT_ID;
     const redirectUri = encodeURIComponent('https://www.laysun.co/api/auth');
@@ -70,12 +70,10 @@ export async function onRequest(context) {
 <body>
   <script>
     (function() {
-      // 发送认证数据给父窗口（Decap CMS）
       window.opener.postMessage(
         ${JSON.stringify(JSON.stringify(authData))},
         '*'
       );
-      // 关闭当前窗口
       window.close();
     })();
   </script>
@@ -86,5 +84,16 @@ export async function onRequest(context) {
 
   return new Response(html, {
     headers: { 'Content-Type': 'text/html' },
+  });
+}
+
+// 处理 OPTIONS 请求（CORS 预检）
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
   });
 }

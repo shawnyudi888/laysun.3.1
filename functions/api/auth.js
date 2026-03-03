@@ -15,7 +15,6 @@ export async function onRequest(context) {
     );
   }
 
-  // 用 code 换取 access_token
   const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
     headers: {
@@ -37,7 +36,6 @@ export async function onRequest(context) {
 
   const accessToken = tokenData.access_token;
 
-  // 获取用户信息
   const userRes = await fetch('https://api.github.com/user', {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -57,7 +55,7 @@ export async function onRequest(context) {
     },
   };
 
-  // 返回 HTML，添加调试和重试机制
+  // 使用更可靠的 postMessage 方式
   const html = `
 <!DOCTYPE html>
 <html>
@@ -65,36 +63,64 @@ export async function onRequest(context) {
   <title>Auth Callback</title>
 </head>
 <body>
+  <p>Authentication successful. Closing window...</p>
   <script>
     (function() {
       var authData = ${JSON.stringify(JSON.stringify(authData))};
+      var attempts = 0;
+      var maxAttempts = 50;
       
-      function sendMessage() {
-        if (window.opener) {
-          window.opener.postMessage(authData, '*');
-          console.log('Message sent to opener');
-          setTimeout(function() {
-            window.close();
-          }, 100);
+      function trySendMessage() {
+        attempts++;
+        
+        if (window.opener && window.opener !== window) {
+          try {
+            // 尝试多种方式发送
+            window.opener.postMessage(authData, '*');
+            window.opener.postMessage({ type: 'auth', data: authData }, '*');
+            
+            console.log('Auth data sent successfully');
+            
+            // 延迟关闭，确保消息送达
+            setTimeout(function() {
+              window.close();
+            }, 500);
+            
+            return;
+          } catch (e) {
+            console.error('postMessage failed:', e);
+          }
+        }
+        
+        if (attempts < maxAttempts) {
+          setTimeout(trySendMessage, 100);
         } else {
-          console.error('No window.opener found');
-          // 尝试通过 localStorage 传递（备用方案）
-          localStorage.setItem('decap-cms-auth', authData);
-          document.body.innerHTML = '<p>Authentication successful. Please close this window and refresh the admin page.</p>';
+          // 最终备用方案：显示手动复制提示
+          document.body.innerHTML = 
+            '<h2>Authentication Successful</h2>' +
+            '<p>Please copy this token and paste it in the admin page:</p>' +
+            '<textarea style="width:100%;height:100px">' + authData + '</textarea>' +
+            '<p>Then close this window and refresh the admin page.</p>';
         }
       }
       
-      // 延迟执行，确保 opener 已准备好
-      setTimeout(sendMessage, 100);
+      // 立即尝试，同时监听页面加载完成
+      if (document.readyState === 'complete') {
+        trySendMessage();
+      } else {
+        window.onload = trySendMessage;
+      }
     })();
   </script>
-  <p>Processing authentication...</p>
 </body>
 </html>
   `;
 
   return new Response(html, {
-    headers: { 'Content-Type': 'text/html' },
+    headers: { 
+      'Content-Type': 'text/html',
+      'Cache-Control': 'no-cache, no-store, must-revalidate'
+    },
   });
 }
 

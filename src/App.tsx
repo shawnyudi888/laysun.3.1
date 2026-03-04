@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { Home } from '@/pages/Home';
-import { Systems } from '@/pages/Systems';
-import { Manufacturing } from '@/pages/Manufacturing';
-import { Projects } from '@/pages/Projects';
-import { About } from '@/pages/About';
-import { Contact } from '@/pages/Contact';
-import { Products } from '@/pages/Products';
-import { Procurement } from '@/pages/Procurement';
-import { CaseStudies } from '@/pages/CaseStudies';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
+import { Home } from './pages/Home';
+import { Systems } from './pages/Systems';
+import { Manufacturing } from './pages/Manufacturing';
+import { Projects } from './pages/Projects';
+import { About } from './pages/About';
+import { Contact } from './pages/Contact';
+import { Products } from './pages/Products';
+import { Procurement } from './pages/Procurement';
+import { CaseStudies } from './pages/CaseStudies';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
